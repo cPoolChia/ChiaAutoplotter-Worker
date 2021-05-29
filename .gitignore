@@ -3,4 +3,5 @@
 .vscode/settings.json
 **/__pycache__
 celerybeat-schedule
-/app/db/database.db
+/data/logs/*.log
+/data/database.db
