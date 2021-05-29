@@ -27,8 +27,7 @@ class PlottingCBV(BaseAuthCBV):
         """ Start a new plotting task. """
 
         execution_id = await executor.execute(
-            "cd /root/ ; "
-            "pwd; "
+            "cd /root/chia-blockchain ; "
             ". ./activate ; "
             "chia "
             "plots "
