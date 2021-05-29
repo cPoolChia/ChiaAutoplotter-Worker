@@ -1,23 +1,29 @@
-from typing import Any
-
 from app import crud, models, schemas
 from app.api import deps
-from app.core.config import settings
-from app.utils import auth
-from fastapi import APIRouter, Depends, HTTPException, Body, Query
-from sqlalchemy.orm import Session
+from app.api.routes.base import BaseCBV
+from fastapi import Depends, HTTPException
+from fastapi_utils.cbv import cbv
+from fastapi_utils.inferring_router import InferringRouter
 
-router = APIRouter()
+router = InferringRouter()
 
 
-@router.get(
-    "/",
-    response_model=schemas.UserReturn,
-    responses={403: {"model": schemas.Error, "description": "Forbidden"}},
-)
-def get_user_data(
-    user: models.User = Depends(deps.get_current_user),
-) -> Any:
-    """ Get your user data. """
+@cbv(router)
+class UserCBV(BaseCBV):
+    @router.get("/")
+    def get_user_data(
+        self, user: models.User = Depends(deps.get_current_user)
+    ) -> schemas.UserReturn:
+        """ Get your user data. """
 
-    return user.__dict__
+        return user.__dict__
+
+    @router.post("/")
+    def get_user_data(self, data: schemas.UserCreate) -> schemas.UserReturn:
+        """ Register a user to be able to connect. """
+
+        if crud.user.get_multi()[0] > 0:
+            raise HTTPException(403, detail="Only first user can be registered")
+
+        user = crud.user.create(self.db, obj_in=data)
+        return schemas.UserReturn.from_orm(user)

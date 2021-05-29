@@ -1,15 +1,10 @@
-from datetime import timedelta, datetime
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import api_router
 from app.db.session import DatabaseSession
-from app.db import init_db
 from app.core.config import settings
-from app.core import listeners, tasks
-from app.api import deps
-from app import crud, schemas
-from fastapi.logger import logger
+from app.db.base_class import Base
 
 
 app = FastAPI(
@@ -24,18 +19,6 @@ app = FastAPI(
         {
             "name": "User",
             "description": "Operations related to user account.",
-        },
-        {
-            "name": "Plots",
-            "description": "Operations related to plots.",
-        },
-        {
-            "name": "Plot Queue",
-            "description": "Operations related to plot queues.",
-        },
-        {
-            "name": "Server",
-            "description": "Operations related to servers.",
         },
     ],
 )

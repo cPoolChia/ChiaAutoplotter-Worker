@@ -9,17 +9,15 @@ import pytest
 import os
 from fastapi.encoders import jsonable_encoder
 from app import app as fast_api
-from app import db as db_module, schemas, models, crud
+from app import schemas, models, crud
 from app.api.deps import get_db
 from app.core.config import settings
-from app.utils import auth, repeats
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 
 @pytest.fixture
-@repeats(60)
 def db() -> Session:
     schema_name = f"test_{round(time.time()*100000)}_{os.getpid()}"
     engine = create_engine(settings.SQLALCHEMY_DATABASE.replace("/main", ""))
@@ -30,7 +28,6 @@ def db() -> Session:
     engine = create_engine(settings.SQLALCHEMY_DATABASE.replace("main", schema_name))
     TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = TestingSessionLocal()
-    db_module.init_db(session)
     return session
 
 

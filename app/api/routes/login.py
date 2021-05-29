@@ -17,14 +17,7 @@ from app.utils import auth
 router = APIRouter()
 
 
-@router.post(
-    "/access-token/",
-    response_model=schemas.Token,
-    responses={
-        400: {"model": schemas.Error, "description": "Authentication error"},
-        403: {"model": schemas.Error, "description": "Forbidden"},
-    },
-)
+@router.post("/access-token/", response_model=schemas.Token)
 def login_access_token(
     db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
@@ -53,9 +46,6 @@ def login_access_token(
 @router.put(
     "/access-token/",
     response_model=schemas.Token,
-    responses={
-        404: {"model": schemas.Error, "description": "Not found"},
-    },
 )
 def refresh_token(
     user: models.User = Depends(deps.get_current_user_raw),

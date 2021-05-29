@@ -1,15 +1,13 @@
-from app import schemas
 from typing import Any, Generic, Literal, Optional, TypeVar, Union, get_args
 from uuid import UUID
 
+from app import schemas
+from app.db.base_class import Base
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
 from sqlalchemy import desc
+from sqlalchemy.orm import Session
 from sqlalchemy.orm.query import Query
-from app.core import listeners
-
-from app.db.base_class import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -25,8 +23,6 @@ class CRUDBase(
     update_schema: type[UpdateSchemaType]
     return_schema: type[ReturnSchemaType]
 
-    _listener: Optional[listeners.ObjectUpdateListener] = None
-
     def __init__(self) -> None:
         """
         CRUD object with default methods to Create, Read, Update, Delete (CRUD).
@@ -40,61 +36,19 @@ class CRUDBase(
             self.__class__.__orig_bases__[0]  # type: ignore
         )
 
-    @classmethod
-    def set_object_listener(cls, listener: listeners.ObjectUpdateListener) -> None:
-        cls._listener = listener
-
-    def notify_change(
-        self,
-        db_obj: ModelType,
-        change_type: Union[Literal["update"], Literal["delete"]],
-    ) -> None:
-        if self._listener is not None:
-            self._listener.notify_change(db_obj, self.return_schema, change_type)
-
     def length(self, db: Session) -> int:
         return db.query(self.model).count()
 
     def get(self, db: Session, id: UUID) -> Optional[ModelType]:
         return db.query(self.model).filter(self.model.id == id).first()
 
-    def get_multi(
-        self,
-        db: Session,
-        *,
-        filtration: schemas.FilterData[Any] = schemas.FilterData[Any]()
-    ) -> tuple[int, list[ModelType]]:
+    def get_multi(self, db: Session) -> tuple[int, list[ModelType]]:
         query = db.query(self.model)
-        return self._filter_multi_query(query, filtration)
+        return self._filter_multi_query(query)
 
-    def _filter_multi_query(
-        self, query: Query, filtration: schemas.FilterData
-    ) -> tuple[int, list[ModelType]]:
-        for col_name, (filter_type, filter_value) in filtration.data.items():
-            column = getattr(self.model, col_name)
-            if filter_type == schemas.FilterType.VALUE:
-                query = query.filter(column == filter_value)
-            elif filter_type == schemas.FilterType.DATETIME:
-                start_date, end_date = filter_value
-                if start_date is not None:
-                    query = query.filter(column >= filter_value)
-                if end_date is not None:
-                    query = query.filter(column <= filter_value)
-            elif filter_type == schemas.FilterType.ENUM:
-                query = query.filter(column in filter_value)
-
-        query = query.order_by(
-            self.model.created
-            if filtration.sort is None
-            else getattr(self.model, filtration.sort.column)
-            if filtration.sort.direction != schemas.SortType.ASC
-            else getattr(self.model, filtration.sort.column).desc()
-        )
-
-        return (
-            query.count(),
-            query.offset(filtration.offset).limit(filtration.limit).all(),
-        )
+    def _filter_multi_query(self, query: Query) -> tuple[int, list[ModelType]]:
+        query = query.order_by(self.model.created)
+        return (query.count(), query.all())
 
     def create(
         self, db: Session, *, obj_in: CreateSchemaType, commit: bool = True
@@ -105,7 +59,6 @@ class CRUDBase(
         if commit:
             db.commit()
             db.refresh(db_obj)
-            self.notify_change(db_obj, "update")
         return db_obj
 
     def update(
@@ -128,7 +81,6 @@ class CRUDBase(
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
-        self.notify_change(db_obj, "update")
         return db_obj
 
     def remove(self, db: Session, *, id: UUID) -> Optional[ModelType]:
@@ -138,5 +90,4 @@ class CRUDBase(
     def remove_obj(self, db: Session, *, obj: ModelType) -> ModelType:
         db.delete(obj)
         db.commit()
-        self.notify_change(obj, "delete")
         return obj
