@@ -13,9 +13,9 @@ class CommandExecution(BaseCommandExecution):
         self._process: asyncio.subprocess.Process = None
         self._output: str = ""
 
-    async def execute(self, command: list[str]) -> None:
+    async def execute(self, command: str) -> None:
         self._process = await asyncio.create_subprocess_shell(
-            shlex.join(command),
+            command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
         )
@@ -24,10 +24,6 @@ class CommandExecution(BaseCommandExecution):
         return self._output
 
     async def output(self) -> AsyncIterable[str]:
-        for i in range(20):
-            yield f"Starting in {20 - i}"
-            await asyncio.sleep(1)
-
         async for output in self._process.stdout:
             self._output += output.decode("utf8", errors="ignore")
             yield self._output
@@ -47,10 +43,11 @@ class CommandExecutor(BaseCommandExecutor):
     def __init__(self) -> None:
         self._executions: dict[uuid.UUID, ExecutionData] = {}
 
-    async def execute(self, command: list[str]) -> uuid.UUID:
+    async def execute(self, command: Union[list[str], str]) -> uuid.UUID:
         execution_id = uuid.uuid4()
         self._executions[execution_id] = ExecutionData()
-        await self._executions[execution_id].execution.execute(command)
+        command_text = command if isinstance(command, str) else shlex.join(command)
+        await self._executions[execution_id].execution.execute(command_text)
         asyncio.create_task(self._run_execution(execution_id))
         return execution_id
 

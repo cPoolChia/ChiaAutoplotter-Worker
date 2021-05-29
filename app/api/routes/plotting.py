@@ -27,21 +27,20 @@ class PlottingCBV(BaseAuthCBV):
         """ Start a new plotting task. """
 
         execution_id = await executor.execute(
-            ["cd", "/root/chia_plotting;"]
-            + [".", "./activate;"]
-            + [
-                "chia",
-                "plots",
-                "create",
-                f"-t {data.temp_dir}",
-                f"-d {data.final_dir}",
-                f"-n {data.plots_amount}",
-                f"-p {data.pool_key}",
-                f"-f {data.farmer_key}",
-                f"-k {data.k}",
-                f"-r {data.threads}",
-                f"-b {data.ram}",
-            ],
+            "cd /root/ ; "
+            "pwd; "
+            ". ./activate ; "
+            "chia "
+            "plots "
+            "create "
+            f"-t {data.temp_dir} "
+            f"-d {data.final_dir} "
+            f"-n {data.plots_amount} "
+            f"-p {data.pool_key} "
+            f"-f {data.farmer_key} "
+            f"-k {data.k} "
+            f"-r {data.threads} "
+            f"-b {data.ram} "
         )
 
         return schemas.PlottingReturn(id=execution_id)

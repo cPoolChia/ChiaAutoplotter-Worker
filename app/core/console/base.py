@@ -5,7 +5,7 @@ import uuid
 
 class BaseCommandExecution(ABC):
     @abstractmethod
-    async def execute(self, command: list[str]) -> None:
+    async def execute(self, command: str) -> None:
         ...
 
     @abstractmethod
@@ -18,7 +18,7 @@ AsyncStrCallback = Callable[[str], Awaitable[None]]
 
 class BaseCommandExecutor(ABC):
     @abstractmethod
-    async def execute(self, command: list[str]) -> uuid.UUID:
+    async def execute(self, command: Union[list[str], str]) -> uuid.UUID:
         ...
 
     @abstractmethod
