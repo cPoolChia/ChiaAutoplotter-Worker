@@ -28,7 +28,7 @@ class GlobalConfig(BaseSettings):
     # environment specific variables do not need the Field class
     CELERY_BACKEND: Optional[str] = None
     CELERY_BROKER: Optional[str] = None
-    SQLALCHEMY_DATABASE: Optional[str] = "sqlite:///app/db/database.db"
+    SQLALCHEMY_DATABASE: Optional[str] = "sqlite:///data/database.db"
 
     SECRET_KEY: str = secrets.token_urlsafe(32)
 

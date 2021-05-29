@@ -1,3 +1,4 @@
+from functools import cache
 from typing import Iterator
 
 from fastapi import Depends, HTTPException, status
@@ -8,7 +9,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
 from app import crud, models, schemas
-from app.core import security
+from app.core import security, console
 from app.core.config import settings
 from app.db.session import DatabaseSession
 
@@ -21,6 +22,11 @@ def get_db() -> Iterator[Session]:
         yield db
     finally:
         db.close()
+
+
+@cache
+def get_command_executor() -> console.BaseCommandExecutor:
+    return console.CommandExecutor()
 
 
 def get_token_data(token: str = Depends(reusable_oauth2)) -> schemas.AuthTokenPayload:

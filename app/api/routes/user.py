@@ -19,10 +19,10 @@ class UserCBV(BaseCBV):
         return user.__dict__
 
     @router.post("/")
-    def get_user_data(self, data: schemas.UserCreate) -> schemas.UserReturn:
+    def reg_new_user(self, data: schemas.UserCreate) -> schemas.UserReturn:
         """ Register a user to be able to connect. """
 
-        if crud.user.get_multi()[0] > 0:
+        if crud.user.get_multi(self.db)[0] > 0:
             raise HTTPException(403, detail="Only first user can be registered")
 
         user = crud.user.create(self.db, obj_in=data)
