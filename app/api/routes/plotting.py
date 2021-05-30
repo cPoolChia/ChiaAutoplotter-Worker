@@ -29,7 +29,7 @@ class PlottingCBV(BaseAuthCBV):
         if result is None:
             return schemas.PlottingReturn(id=execution_id)
         return schemas.PlottingReturn(
-            id=execution_id, finised=True, status_code=result[0]
+            id=execution_id, finished=True, status_code=result[0]
         )
 
     @router.post("/")
