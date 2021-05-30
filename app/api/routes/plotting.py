@@ -18,15 +18,27 @@ router = InferringRouter()
 
 @cbv(router)
 class PlottingCBV(BaseAuthCBV):
+    executor: BaseCommandExecutor = Depends(deps.get_command_executor)
+
+    @router.get("/{execution_id}/")
+    async def get_plotting(self, execution_id: UUID) -> schemas.PlottingReturn:
+        if execution_id not in self.executor:
+            raise HTTPException(404, detail="No plotting with such id found")
+
+        result = self.executor.result(execution_id)
+        if result is None:
+            return schemas.PlottingReturn(id=execution_id)
+        return schemas.PlottingReturn(
+            id=execution_id, finised=True, status_code=result[0]
+        )
+
     @router.post("/")
     async def start_plotting(
-        self,
-        data: schemas.PlottingData,
-        executor: BaseCommandExecutor = Depends(deps.get_command_executor),
+        self, data: schemas.PlottingData
     ) -> schemas.PlottingReturn:
         """ Start a new plotting task. """
 
-        execution_id = await executor.execute(
+        execution_id = await self.executor.execute(
             "cd /root/chia-blockchain ; "
             ". ./activate ; "
             "chia "

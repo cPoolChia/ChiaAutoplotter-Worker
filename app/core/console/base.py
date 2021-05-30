@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, AsyncIterable, Callable, Awaitable, Union
+from typing import Any, AsyncIterable, Callable, Awaitable, Optional, Union
 import uuid
 
 
@@ -10,6 +10,11 @@ class BaseCommandExecution(ABC):
 
     @abstractmethod
     async def output(self) -> AsyncIterable[str]:
+        ...
+
+    @abstractmethod
+    @property
+    def return_code(self) -> Optional[int]:
         ...
 
 
@@ -26,7 +31,7 @@ class BaseCommandExecutor(ABC):
         ...
 
     @abstractmethod
-    def result(self, execution_id: uuid.UUID) -> str:
+    def result(self, execution_id: uuid.UUID) -> Optional[tuple[int, str]]:
         ...
 
     @abstractmethod

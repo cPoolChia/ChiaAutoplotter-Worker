@@ -23,6 +23,10 @@ class CommandExecution(BaseCommandExecution):
     def current_output(self) -> str:
         return self._output
 
+    @property
+    def return_code(self) -> Optional[int]:
+        return self._process.returncode
+
     async def output(self) -> AsyncIterable[str]:
         async for output in self._process.stdout:
             self._output += output.decode("utf8", errors="ignore")
@@ -66,7 +70,10 @@ class CommandExecutor(BaseCommandExecutor):
                     execution_data.callback_data[callback].set()
                     del execution_data.callback_data[callback]
 
+        return_value = execution_data.execution.return_code or -1
+
         with open(self.__get_command_log_path(execution_id), mode="w") as file:
+            file.write(f"{return_value}\n")
             file.write(output_update)
 
         for callback in execution_data.callback_data:
@@ -84,9 +91,13 @@ class CommandExecutor(BaseCommandExecutor):
     def finished(self, execution_id: uuid.UUID) -> bool:
         return os.path.isfile(self.__get_command_log_path(execution_id))
 
-    def result(self, execution_id: uuid.UUID) -> str:
+    def result(self, execution_id: uuid.UUID) -> Optional[tuple[int, str]]:
+        if not self.finished(execution_id):
+            return
+
         with open(self.__get_command_log_path(execution_id), mode="r") as file:
-            return file.read()
+            return_code, file_content = file.read().split("\n", maxsplit=1)
+            return return_code, file_content
 
     async def listen(self, callback: AsyncStrCallback, execution_id: uuid.UUID) -> None:
         execution = self._executions[execution_id]

@@ -19,3 +19,5 @@ class PlottingData(APIModel):
 
 class PlottingReturn(APIModel):
     id: UUID
+    status_code: Optional[int] = None
+    finished: bool = False
