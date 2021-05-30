@@ -12,8 +12,8 @@ class BaseCommandExecution(ABC):
     async def output(self) -> AsyncIterable[str]:
         ...
 
-    @abstractmethod
     @property
+    @abstractmethod
     def return_code(self) -> Optional[int]:
         ...
 
