@@ -46,13 +46,26 @@ class ExecutionData:
 class CommandExecutor(BaseCommandExecutor):
     def __init__(self) -> None:
         self._executions: dict[uuid.UUID, ExecutionData] = {}
+        self.__filter_exec: dict[uuid.UUID, uuid.UUID] = {}
+        self.__exec_filter: dict[uuid.UUID, uuid.UUID] = {}
 
-    async def execute(self, command: Union[list[str], str]) -> uuid.UUID:
+    async def execute(
+        self, command: Union[list[str], str], *, filter_id: Optional[uuid.UUID] = None
+    ) -> uuid.UUID:
         execution_id = uuid.uuid4()
+        if filter_id is not None:
+            if filter_id in self.__filter_exec:
+                raise PermissionError(
+                    f"A process with filter={filter_id} is already running"
+                )
+            self.__filter_exec[filter_id] = execution_id
+            self.__exec_filter[execution_id] = filter_id
+
         self._executions[execution_id] = ExecutionData()
         command_text = command if isinstance(command, str) else shlex.join(command)
         await self._executions[execution_id].execution.execute(command_text)
         asyncio.create_task(self._run_execution(execution_id))
+
         return execution_id
 
     @staticmethod
@@ -80,6 +93,10 @@ class CommandExecutor(BaseCommandExecutor):
             execution_data.callback_data[callback].set()
 
         del self._executions[execution_id]
+        if execution_id in self.__exec_filter:
+            filter_id = self.__exec_filter[execution_id]
+            del self.__filter_exec[filter_id]
+            del self.__exec_filter[execution_id]
 
     def __contains__(
         self, execution_id: Union[uuid.UUID, Any]

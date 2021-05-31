@@ -9,6 +9,7 @@ from pydantic import Field
 class PlottingData(APIModel):
     final_dir: str
     temp_dir: str
+    queue_id: UUID
     pool_key: str
     farmer_key: str
     plots_amount: int

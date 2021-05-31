@@ -10,6 +10,7 @@ import asyncio
 
 from uuid import UUID
 import time
+import os.path
 from fastapi.encoders import jsonable_encoder
 import asyncio
 
@@ -38,21 +39,30 @@ class PlottingCBV(BaseAuthCBV):
     ) -> schemas.PlottingReturn:
         """ Start a new plotting task. """
 
-        execution_id = await self.executor.execute(
-            "cd /root/chia-blockchain ; "
-            ". ./activate ; "
-            "chia "
-            "plots "
-            "create "
-            f"-t {data.temp_dir} "
-            f"-d {data.final_dir} "
-            f"-n {data.plots_amount} "
-            f"-p {data.pool_key} "
-            f"-f {data.farmer_key} "
-            f"-k {data.k} "
-            f"-r {data.threads} "
-            f"-b {data.ram} "
-        )
+        temp_dir_full = os.path.join(data.temp_dir, str(data.queue_id))
+        final_dir_full = os.path.join(data.final_dir, str(data.queue_id))
+
+        try:
+            execution_id = await self.executor.execute(
+                "cd /root/chia-blockchain ; "
+                ". ./activate ; "
+                "chia "
+                "plots "
+                "create "
+                f"-t {temp_dir_full} "
+                f"-d {final_dir_full} "
+                f"-n {data.plots_amount} "
+                f"-p {data.pool_key} "
+                f"-f {data.farmer_key} "
+                f"-k {data.k} "
+                f"-r {data.threads} "
+                f"-b {data.ram} ",
+                filter_id=data.queue_id,
+            )
+        except PermissionError as error:
+            raise HTTPException(
+                403, f"A queue with id {data.queue_id} is already plotting"
+            ) from error
 
         return schemas.PlottingReturn(id=execution_id)
 

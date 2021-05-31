@@ -23,7 +23,9 @@ AsyncStrCallback = Callable[[str], Awaitable[None]]
 
 class BaseCommandExecutor(ABC):
     @abstractmethod
-    async def execute(self, command: Union[list[str], str]) -> uuid.UUID:
+    async def execute(
+        self, command: Union[list[str], str], *, filter_id: Optional[uuid.UUID] = None
+    ) -> uuid.UUID:
         ...
 
     @abstractmethod
