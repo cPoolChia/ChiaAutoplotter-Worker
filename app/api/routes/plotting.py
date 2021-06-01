@@ -1,18 +1,18 @@
-from app.core.console.base import BaseCommandExecutor
+import asyncio
+import os.path
+import pathlib
+import time
+from uuid import UUID
+
 from app import crud, models, schemas
-from app.core import console
 from app.api import deps
 from app.api.routes.base import BaseAuthCBV
+from app.core import console
+from app.core.console.base import BaseCommandExecutor
 from fastapi import Depends, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.encoders import jsonable_encoder
 from fastapi_utils.cbv import cbv
 from fastapi_utils.inferring_router import InferringRouter
-import asyncio
-
-from uuid import UUID
-import time
-import os.path
-from fastapi.encoders import jsonable_encoder
-import asyncio
 
 router = InferringRouter()
 
@@ -41,6 +41,9 @@ class PlottingCBV(BaseAuthCBV):
 
         temp_dir_full = os.path.join(data.temp_dir, str(data.queue_id))
         final_dir_full = os.path.join(data.final_dir, str(data.queue_id))
+
+        pathlib.Path(temp_dir_full).mkdir(parents=True, exist_ok=True)
+        pathlib.Path(final_dir_full).mkdir(parents=True, exist_ok=True)
 
         try:
             execution_id = await self.executor.execute(
