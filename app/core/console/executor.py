@@ -103,7 +103,7 @@ class CommandExecutor(BaseCommandExecutor):
     ) -> Optional[CommandExecution]:
         if not isinstance(execution_id, uuid.UUID):
             return False
-        return execution_id in self._executions
+        return execution_id in self._executions or self.finished(execution_id)
 
     def finished(self, execution_id: uuid.UUID) -> bool:
         return os.path.isfile(self.__get_command_log_path(execution_id))
