@@ -63,7 +63,7 @@ chia init
 ```
 <i>Detailed [here](https://github.com/Chia-Network/chia-blockchain/wiki/INSTALL).</i>
 
-#### 3. Install ChiaAutoplotter-Worker 
+#### 3. Download ChiaAutoplotter-Worker 
 <i>It needs to be located at</i> `/root/ChiaAutoplotter-Worker`<i>, just git clone while in</i> `/root/`
 ```shell
 # Go to root directory
