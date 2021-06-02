@@ -98,7 +98,7 @@ cd /ChiaAutoplotter-Worker
 python3.9 -m poetry install
 python3.9 -m poetry run uvicorn app:app --reload --host 0.0.0.0
 ```
-Create a new window (with shell) – `Ctrl+a` and `Ctrl+d`
+Close a new screen (with shell) – `Ctrl+a` and `Ctrl+d`
 
 #### 7. Open port 8000 on server (if needed (if it’s in local network), redirect to it in router)
 ```shell
