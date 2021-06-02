@@ -1,5 +1,4 @@
-# ChiaAutoplotter
-## Make multi-machine plotting easy!
+# ChiaAutoplotter - Make multi-machine plotting easy!
 
 ChiaAutoplotter is a utility program, made by [CPool.farm](https://www.cpool.farm) team for inner purposes. It is designed to solve next problems:
 
