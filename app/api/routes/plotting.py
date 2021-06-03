@@ -47,7 +47,7 @@ class PlottingCBV(BaseAuthCBV):
 
         try:
             execution_id = await self.executor.execute(
-                "cd /root/chia-blockchain ; "
+                "cd chia-blockchain ; "
                 ". ./activate ; "
                 "chia "
                 "plots "
