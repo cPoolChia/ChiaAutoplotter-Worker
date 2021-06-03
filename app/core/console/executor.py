@@ -29,7 +29,7 @@ class CommandExecution(BaseCommandExecution):
 
     async def output(self) -> AsyncIterable[str]:
         async for output in self._process.stdout:
-            self._output += output.decode("utf8", errors="ignore")
+            self._output += (output + "\n").decode("utf8", errors="ignore")
             yield self._output
 
 
