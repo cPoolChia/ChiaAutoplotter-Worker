@@ -81,7 +81,7 @@ async def websocket_endpoint(
 
     send_console_json = lambda output: websocket.send_json({"output": output})
     if executor.finished(execution_id):
-        return await send_console_json(executor.result(execution_id))
+        return await send_console_json(executor.result(execution_id)[1])
 
     if execution_id not in executor:
         return await websocket.send_json({"error": "No such execution id"})
