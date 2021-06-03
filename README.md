@@ -1,3 +1,8 @@
+![Docker](https://img.shields.io/badge/-Docker-000000?style=for-the-badge&logo=Docker)
+![Python](https://img.shields.io/badge/-Python-000000?style=for-the-badge&logo=Python)
+![FastAPI](https://img.shields.io/badge/-FastAPI-000000?style=for-the-badge&logo=FastAPI)
+![Black](https://img.shields.io/badge/-Black-000000?style=for-the-badge&logo=Black)
+
 # ChiaAutoplotter - Make multi-machine plotting easy!
 
 ChiaAutoplotter is a utility program, made by [CPool.farm](https://www.cpool.farm) team for inner purposes. It is designed to solve next problems:
