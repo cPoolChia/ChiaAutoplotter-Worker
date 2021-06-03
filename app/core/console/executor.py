@@ -13,12 +13,14 @@ class CommandExecution(BaseCommandExecution):
         self._process: asyncio.subprocess.Process = None
         self._output: str = ""
 
-    async def execute(self, command: str) -> None:
+    async def execute(self, command: str, *, stdin: Optional[bytes] = None) -> None:
         self._process = await asyncio.create_subprocess_shell(
             command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
         )
+        if stdin is not None and self._process.stdin is not None:
+            self._process.stdin.write(stdin)
 
     def current_output(self) -> str:
         return self._output
@@ -28,8 +30,10 @@ class CommandExecution(BaseCommandExecution):
         return self._process.returncode
 
     async def output(self) -> AsyncIterable[str]:
+        if self._process.stdout is None:
+            return
         async for output in self._process.stdout:
-            self._output += (output + "\n").decode("utf8", errors="ignore")
+            self._output += (output + b"\n").decode("utf8", errors="ignore")
             yield self._output
 
 
@@ -50,7 +54,11 @@ class CommandExecutor(BaseCommandExecutor):
         self.__exec_filter: dict[uuid.UUID, uuid.UUID] = {}
 
     async def execute(
-        self, command: Union[list[str], str], *, filter_id: Optional[uuid.UUID] = None
+        self,
+        command: Union[list[str], str],
+        *,
+        filter_id: Optional[uuid.UUID] = None,
+        stdin: Optional[bytes] = None,
     ) -> uuid.UUID:
         execution_id = uuid.uuid4()
         if filter_id is not None:
@@ -63,7 +71,9 @@ class CommandExecutor(BaseCommandExecutor):
 
         self._executions[execution_id] = ExecutionData()
         command_text = command if isinstance(command, str) else shlex.join(command)
-        await self._executions[execution_id].execution.execute(command_text)
+        await self._executions[execution_id].execution.execute(
+            command_text, stdin=stdin
+        )
         asyncio.create_task(self._run_execution(execution_id))
 
         return execution_id
@@ -98,9 +108,7 @@ class CommandExecutor(BaseCommandExecutor):
             del self.__filter_exec[filter_id]
             del self.__exec_filter[execution_id]
 
-    def __contains__(
-        self, execution_id: Union[uuid.UUID, Any]
-    ) -> Optional[CommandExecution]:
+    def __contains__(self, execution_id: Union[uuid.UUID, Any]) -> bool:
         if not isinstance(execution_id, uuid.UUID):
             return False
         return execution_id in self._executions or self.finished(execution_id)
@@ -110,11 +118,11 @@ class CommandExecutor(BaseCommandExecutor):
 
     def result(self, execution_id: uuid.UUID) -> Optional[tuple[int, str]]:
         if not self.finished(execution_id):
-            return
+            return None
 
         with open(self.__get_command_log_path(execution_id), mode="r") as file:
             return_code, file_content = file.read().split("\n", maxsplit=1)
-            return return_code, file_content
+            return int(return_code), file_content
 
     async def listen(self, callback: AsyncStrCallback, execution_id: uuid.UUID) -> None:
         execution = self._executions[execution_id]
