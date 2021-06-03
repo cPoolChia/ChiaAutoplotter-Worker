@@ -33,7 +33,7 @@ class CommandExecution(BaseCommandExecution):
         if self._process.stdout is None:
             return
         async for output in self._process.stdout:
-            self._output += (output + b"\n").decode("utf8", errors="ignore")
+            self._output += output.decode("utf8", errors="ignore")
             yield self._output
 
 
