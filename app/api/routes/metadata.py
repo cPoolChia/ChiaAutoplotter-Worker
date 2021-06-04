@@ -8,7 +8,6 @@ router = InferringRouter()
 @router.get("/")
 def get_metadata() -> schemas.MetadataReturn:
     poetry_project_config = toml.load("pyproject.toml")
-    raise Exception(poetry_project_config)
     return schemas.MetadataReturn(
-        version=poetry_project_config["tool.poetry"]["version"]
+        version=poetry_project_config["tool"]["poetry"]["version"]
     )
