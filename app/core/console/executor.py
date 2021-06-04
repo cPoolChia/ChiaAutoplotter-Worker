@@ -20,7 +20,7 @@ class CommandExecution(BaseCommandExecution):
             command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
-            cwd=cwd or ...,
+            cwd=cwd,
         )
         if stdin is not None and self._process.stdin is not None:
             self._process.stdin.write(stdin)
