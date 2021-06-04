@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ChiaAutoplotter - Worker"
-version = "0.1.0"
+version = "0.1.1"
 description = "A worker client to be placed on monitored machines for Autoplotter"
 authors = ["LeaveMyYard"]
 license = "MIT"
