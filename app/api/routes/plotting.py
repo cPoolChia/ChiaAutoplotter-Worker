@@ -43,13 +43,14 @@ class PlottingCBV(BaseAuthCBV):
         temp_dir_full = os.path.join(data.temp_dir, str(data.queue_id))
         final_dir_full = os.path.join(data.final_dir, str(data.queue_id))
 
-        try:
-            shutil.rmtree(temp_dir_full)
-        except OSError:
-            pass
+        def on_starting() -> None:
+            try:
+                shutil.rmtree(temp_dir_full)
+            except OSError:
+                pass
 
-        pathlib.Path(temp_dir_full).mkdir(parents=True, exist_ok=True)
-        pathlib.Path(final_dir_full).mkdir(parents=True, exist_ok=True)
+            pathlib.Path(temp_dir_full).mkdir(parents=True, exist_ok=True)
+            pathlib.Path(final_dir_full).mkdir(parents=True, exist_ok=True)
 
         try:
             execution_id = await self.executor.execute(
@@ -67,6 +68,7 @@ class PlottingCBV(BaseAuthCBV):
                 f"-r {data.threads} "
                 f"-b {data.ram} ",
                 filter_id=data.queue_id,
+                on_starting=on_starting,
             )
         except PermissionError as error:
             raise HTTPException(

@@ -63,6 +63,7 @@ class CommandExecutor(BaseCommandExecutor):
         filter_id: Optional[uuid.UUID] = None,
         stdin: Optional[bytes] = None,
         cwd: Optional[str] = None,
+        on_starting: Optional[Callable[[], None]] = None,
     ) -> uuid.UUID:
         execution_id = uuid.uuid4()
         if filter_id is not None:
@@ -72,6 +73,9 @@ class CommandExecutor(BaseCommandExecutor):
                 )
             self.__filter_exec[filter_id] = execution_id
             self.__exec_filter[execution_id] = filter_id
+
+        if on_starting is not None:
+            on_starting()
 
         self._executions[execution_id] = ExecutionData()
         command_text = command if isinstance(command, str) else shlex.join(command)

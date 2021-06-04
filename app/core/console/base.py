@@ -32,6 +32,7 @@ class BaseCommandExecutor(ABC):
         filter_id: Optional[uuid.UUID] = None,
         stdin: Optional[bytes] = None,
         cwd: Optional[str] = None,
+        on_starting: Optional[Callable[[], None]] = None,
     ) -> uuid.UUID:
         ...
 
