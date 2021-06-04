@@ -74,10 +74,15 @@ class CommandExecutor(BaseCommandExecutor):
             self.__filter_exec[filter_id] = execution_id
             self.__exec_filter[execution_id] = filter_id
 
-        if on_starting is not None:
-            on_starting()
-
         self._executions[execution_id] = ExecutionData()
+
+        if on_starting is not None:
+            try:
+                on_starting()
+            except:
+                self.__forget_execution(execution_id)
+                raise
+
         command_text = command if isinstance(command, str) else shlex.join(command)
         await self._executions[execution_id].execution.execute(
             command_text, stdin=stdin, cwd=cwd
@@ -110,6 +115,9 @@ class CommandExecutor(BaseCommandExecutor):
         for callback in execution_data.callback_data:
             execution_data.callback_data[callback].set()
 
+        self.__forget_execution(execution_id)
+
+    def __forget_execution(self, execution_id: uuid.UUID) -> None:
         del self._executions[execution_id]
         if execution_id in self.__exec_filter:
             filter_id = self.__exec_filter[execution_id]
