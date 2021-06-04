@@ -2,6 +2,7 @@ import asyncio
 import os.path
 import pathlib
 import time
+import shutil
 from uuid import UUID
 
 from app import crud, models, schemas
@@ -41,6 +42,11 @@ class PlottingCBV(BaseAuthCBV):
 
         temp_dir_full = os.path.join(data.temp_dir, str(data.queue_id))
         final_dir_full = os.path.join(data.final_dir, str(data.queue_id))
+
+        try:
+            shutil.rmtree(temp_dir_full)
+        except OSError:
+            pass
 
         pathlib.Path(temp_dir_full).mkdir(parents=True, exist_ok=True)
         pathlib.Path(final_dir_full).mkdir(parents=True, exist_ok=True)
