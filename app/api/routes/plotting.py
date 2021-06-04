@@ -47,7 +47,6 @@ class PlottingCBV(BaseAuthCBV):
 
         try:
             execution_id = await self.executor.execute(
-                "cd /root/chia-blockchain ; "
                 ". ./activate ; "
                 "chia "
                 "plots "
@@ -61,6 +60,7 @@ class PlottingCBV(BaseAuthCBV):
                 f"-r {data.threads} "
                 f"-b {data.ram} ",
                 filter_id=data.queue_id,
+                cwd="/root/chia-blockchain",
             )
         except PermissionError as error:
             raise HTTPException(

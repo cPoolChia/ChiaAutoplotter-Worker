@@ -13,11 +13,14 @@ class CommandExecution(BaseCommandExecution):
         self._process: asyncio.subprocess.Process = None
         self._output: str = ""
 
-    async def execute(self, command: str, *, stdin: Optional[bytes] = None) -> None:
+    async def execute(
+        self, command: str, *, stdin: Optional[bytes] = None, cwd: Optional[str] = None
+    ) -> None:
         self._process = await asyncio.create_subprocess_shell(
             command,
             stdout=asyncio.subprocess.PIPE,
             stderr=asyncio.subprocess.STDOUT,
+            cwd=cwd or ...,
         )
         if stdin is not None and self._process.stdin is not None:
             self._process.stdin.write(stdin)
@@ -59,6 +62,7 @@ class CommandExecutor(BaseCommandExecutor):
         *,
         filter_id: Optional[uuid.UUID] = None,
         stdin: Optional[bytes] = None,
+        cwd: Optional[str] = None,
     ) -> uuid.UUID:
         execution_id = uuid.uuid4()
         if filter_id is not None:
@@ -72,7 +76,7 @@ class CommandExecutor(BaseCommandExecutor):
         self._executions[execution_id] = ExecutionData()
         command_text = command if isinstance(command, str) else shlex.join(command)
         await self._executions[execution_id].execution.execute(
-            command_text, stdin=stdin
+            command_text, stdin=stdin, cwd=cwd
         )
         asyncio.create_task(self._run_execution(execution_id))
 

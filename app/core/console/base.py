@@ -5,7 +5,9 @@ import uuid
 
 class BaseCommandExecution(ABC):
     @abstractmethod
-    async def execute(self, command: str, *, stdin: Optional[bytes] = None) -> None:
+    async def execute(
+        self, command: str, *, stdin: Optional[bytes] = None, cwd: Optional[str] = None
+    ) -> None:
         ...
 
     @abstractmethod
@@ -28,7 +30,8 @@ class BaseCommandExecutor(ABC):
         command: Union[list[str], str],
         *,
         filter_id: Optional[uuid.UUID] = None,
-        stdin: Optional[bytes] = None
+        stdin: Optional[bytes] = None,
+        cwd: Optional[str] = None,
     ) -> uuid.UUID:
         ...
 
