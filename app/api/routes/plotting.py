@@ -60,7 +60,7 @@ class PlottingCBV(BaseAuthCBV):
                 f"-r {data.threads} "
                 f"-b {data.ram} ",
                 filter_id=data.queue_id,
-                cwd="chia-blockchain",
+                cwd="~/chia-blockchain",
             )
         except PermissionError as error:
             raise HTTPException(
