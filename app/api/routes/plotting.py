@@ -72,7 +72,7 @@ class PlottingCBV(BaseAuthCBV):
             )
         except PermissionError as error:
             raise HTTPException(
-                403, f"A queue with id {data.queue_id} is already plotting"
+                409, f"A queue with id {data.queue_id} is already plotting"
             ) from error
 
         return schemas.PlottingReturn(id=execution_id)
