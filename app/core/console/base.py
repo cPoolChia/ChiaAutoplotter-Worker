@@ -23,6 +23,10 @@ class BaseCommandExecution(ABC):
 AsyncStrCallback = Callable[[str], Awaitable[None]]
 
 
+class FiltrationError(PermissionError):
+    ...
+
+
 class BaseCommandExecutor(ABC):
     @abstractmethod
     async def execute(

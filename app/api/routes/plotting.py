@@ -70,7 +70,7 @@ class PlottingCBV(BaseAuthCBV):
                 filter_id=data.queue_id,
                 on_starting=on_starting,
             )
-        except PermissionError as error:
+        except console.executor.FiltrationError as error:
             raise HTTPException(
                 409, f"A queue with id {data.queue_id} is already plotting"
             ) from error

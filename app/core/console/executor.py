@@ -5,7 +5,7 @@ import uuid
 import os.path
 from dataclasses import dataclass, field
 from typing import AsyncIterable, Optional, Awaitable, Callable, Any, Union
-from .base import BaseCommandExecution, BaseCommandExecutor
+from .base import BaseCommandExecution, BaseCommandExecutor, FiltrationError
 
 
 class CommandExecution(BaseCommandExecution):
@@ -68,7 +68,7 @@ class CommandExecutor(BaseCommandExecutor):
         execution_id = uuid.uuid4()
         if filter_id is not None:
             if filter_id in self.__filter_exec:
-                raise PermissionError(
+                raise FiltrationError(
                     f"A process with filter={filter_id} is already running"
                 )
             self.__filter_exec[filter_id] = execution_id
