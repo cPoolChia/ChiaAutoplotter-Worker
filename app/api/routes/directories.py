@@ -17,7 +17,7 @@ router = InferringRouter()
 class DirectoriesCBV(BaseAuthCBV):
     @router.post("/")
     async def scan_directories(
-        self, directories: list[pathlib.Path]
+        self, directories: set[pathlib.Path]
     ) -> dict[pathlib.Path, Optional[schemas.DirInfo]]:
         result: dict[pathlib.Path, Optional[schemas.DirInfo]] = collections.defaultdict(
             schemas.DirInfo
