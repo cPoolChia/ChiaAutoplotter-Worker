@@ -7,7 +7,11 @@ from sqlalchemy.orm.session import Session
 
 from app.core.config import settings
 
-engine = create_engine(settings.SQLALCHEMY_DATABASE, pool_pre_ping=True)
+engine = create_engine(
+    settings.SQLALCHEMY_DATABASE,
+    pool_pre_ping=True,
+    connect_args={"check_same_thread": False},
+)
 DatabaseSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
