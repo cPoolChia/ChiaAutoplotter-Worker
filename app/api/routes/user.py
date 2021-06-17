@@ -11,7 +11,7 @@ router = InferringRouter()
 @cbv(router)
 class UserCBV(BaseCBV):
     @router.get("/")
-    def get_user_data(
+    async def get_user_data(
         self, user: models.User = Depends(deps.get_current_user)
     ) -> schemas.UserReturn:
         """ Get your user data. """
@@ -19,7 +19,7 @@ class UserCBV(BaseCBV):
         return user.__dict__
 
     @router.post("/")
-    def reg_new_user(self, data: schemas.UserCreate) -> schemas.UserReturn:
+    async def reg_new_user(self, data: schemas.UserCreate) -> schemas.UserReturn:
         """ Register a user to be able to connect. """
 
         if crud.user.get_multi(self.db)[0] > 0:

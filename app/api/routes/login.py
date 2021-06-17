@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.post("/access-token/", response_model=schemas.Token)
-def login_access_token(
+async def login_access_token(
     db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
 ) -> Any:
     """
@@ -47,7 +47,7 @@ def login_access_token(
     "/access-token/",
     response_model=schemas.Token,
 )
-def refresh_token(
+async def refresh_token(
     user: models.User = Depends(deps.get_current_user_raw),
 ) -> Any:
     """
