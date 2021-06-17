@@ -47,12 +47,12 @@ class TransferringCBV(BaseAuthCBV):
             execution_id = await self.executor.execute(
                 "rsync -aHAXxv --numeric-ids --delete "
                 '--progress -e "ssh -T -c aes128-gcm@openssh.com -o Compression=no -x" '
-                f"{file_path} " # rsync what
+                f"{file_path} "  # rsync what
                 f"{data.destination_user}@{data.destination_host}:"
-                f"{data.destination_port}/{data.destination_folder} ;" # rsync where
-                f"rm {file_path}"
+                f"{data.destination_port}/{data.destination_folder} ;"  # rsync where
+                f"rm {file_path}",
                 filter_id=data.queue_id,
-                stdin=f"{password}\n".encode('utf8')
+                stdin=f"{password}\n".encode("utf8"),
             )
         except PermissionError as error:
             raise HTTPException(
