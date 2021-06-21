@@ -19,5 +19,5 @@ class DiskData(BaseModel):
 
 
 class DirInfo(BaseModel):
-    plots: set[PlotData] = set()
+    plots: list[PlotData] = []
     disk_size: Optional[DiskData] = None
