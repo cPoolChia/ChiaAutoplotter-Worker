@@ -56,6 +56,5 @@ class DirectoriesCBV(BaseAuthCBV):
                 plots=plots, disk_size=disk.get_disk_data(directory)
             )
 
-            print(type(result))
-
+        print(result)
         return result
