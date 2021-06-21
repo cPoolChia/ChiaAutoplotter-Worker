@@ -9,7 +9,7 @@ class PlotData(BaseModel):
     queue: Optional[uuid.UUID]
 
     def __hash__(self) -> int:
-        return hash((type(self),) + tuple(self.__dict__.values()))
+        return hash((type(self), self.name, self.plotting, self.queue))
 
 
 class DiskData(BaseModel):
