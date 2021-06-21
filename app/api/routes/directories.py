@@ -52,8 +52,10 @@ class DirectoriesCBV(BaseAuthCBV):
                                 )
                             )
 
-                result[directory] = schemas.DirInfo(
-                    plots=plots, disk_size=disk.get_disk_data(directory)
-                )
+            result[directory] = schemas.DirInfo(
+                plots=plots, disk_size=disk.get_disk_data(directory)
+            )
+
+            print(result)
 
         return result
