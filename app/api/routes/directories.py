@@ -34,7 +34,7 @@ class DirectoriesCBV(BaseAuthCBV):
                     plotting = file.name.endswith(".plot")
                     name = ".".join(file.name.split(".")[:2])
                     plots.add(
-                        schemas.PlotData(name=name, plotting=plotting, queue_id=None)
+                        schemas.PlotData(name=name, plotting=plotting, queue=None)
                     )
                 elif file.is_dir():
                     try:
@@ -48,11 +48,12 @@ class DirectoriesCBV(BaseAuthCBV):
                                 schemas.PlotData(
                                     name=sub_file.name,
                                     plotting=plotting,
-                                    queue_id=queue_id,
+                                    queue=queue_id,
                                 )
                             )
 
-            result[directory].plots = plots
-            result[directory].disk_size = disk.get_disk_data(directory)
+                result[directory] = schemas.DirInfo(
+                    plots=plots, disk_size=disk.get_disk_data(directory)
+                )
 
         return result
