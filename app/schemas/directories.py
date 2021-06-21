@@ -8,8 +8,8 @@ class PlotData(BaseModel):
     plotting: bool
     queue: Optional[uuid.UUID]
 
-    class Config:
-        frozen = True
+    def __hash__(self) -> int:
+        return hash((type(self),) + tuple(self.__dict__.values()))
 
 
 class DiskData(BaseModel):
